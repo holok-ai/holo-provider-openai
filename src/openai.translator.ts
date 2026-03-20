@@ -1,6 +1,6 @@
 import 'reflect-metadata';
 import {injectable} from "tsyringe";
-import type {IProviderTranslator} from "@holokai/types/provider";
+import type {IProviderTranslator} from "@holokai/holo-types/provider";
 import {
     OpenAIContentTranslator,
     OpenAIImageContentTranslator,
@@ -14,7 +14,7 @@ import {
     OpenAIToolTranslator,
     OpenAIUsageTranslator
 } from "./translators";
-import {HoloMessage, HoloRequest, HoloResponse, HoloStreamChunk} from "@holokai/types/holo";
+import {HoloMessage, HoloRequest, HoloResponse, HoloStreamChunk} from "@holokai/holo-types/holo";
 import {
     ChatCompletion,
     ChatCompletionChunk,

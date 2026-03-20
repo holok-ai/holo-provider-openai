@@ -1,9 +1,9 @@
 import 'reflect-metadata';
 import {OpenAIContentTranslator} from "./openai.content.translators";
 import {injectable} from 'tsyringe';
-import {createStableId, pickDefined, safeParse} from "@holokai/sdk";
-import {HoloMessage} from "@holokai/types/holo";
-import {BaseTranslator} from "@holokai/sdk/provider";
+import {createStableId, pickDefined, safeParse} from "@holokai/holo-sdk";
+import {HoloMessage} from "@holokai/holo-types/holo";
+import {BaseTranslator} from "@holokai/holo-sdk/provider";
 import {ChatCompletionMessageParam} from "openai/resources/chat/completions/completions";
 
 @injectable()

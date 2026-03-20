@@ -1,11 +1,11 @@
-import {BasePlugin, normalizePricingDataset} from '@holokai/sdk/plugin';
-import type {IProviderPlugin, PluginContext, PluginPricingSheet} from '@holokai/types/plugin';
-import type {PricingSheetModel} from '@holokai/types/entities';
-import {ProtocolCapability} from "@holokai/types/entities";
+import {BasePlugin, normalizePricingDataset} from '@holokai/holo-sdk/plugin';
+import type {IProviderPlugin, PluginContext, PluginPricingSheet} from '@holokai/holo-types/plugin';
+import type {PricingSheetModel} from '@holokai/holo-types/entities';
+import {ProtocolCapability} from "@holokai/holo-types/entities";
 import {manifest} from "./manifest.js";
-import type {IProvider, IWireAdapter, ProviderCapabilities, WireAdapterParams} from "@holokai/types/provider";
+import type {IProvider, IWireAdapter, ProviderCapabilities, WireAdapterParams} from "@holokai/holo-types/provider";
 import {OpenAIProvider} from "./openai.provider";
-import {RouteDefinition, RouteHandler} from "@holokai/types/routing";
+import {RouteDefinition, RouteHandler} from "@holokai/holo-types/routing";
 import {OpenAITranslator} from "./openai.translator";
 import {OpenAICompletionsWireAdapter, OpenAIResponsesWireAdapter} from "./openai.wire.adapter";
 import {OPENAI_PRICING_DATASET} from "./openai.pricing.js";

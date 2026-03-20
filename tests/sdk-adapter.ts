@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import type {ChatCompletionCreateParamsStreaming} from 'openai/resources/chat/completions';
 import type {ResponseCreateParamsStreaming} from 'openai/resources/responses/responses';
-import type {FixtureScenario, SdkAdapter} from '@holokai/test-harness';
+import type {FixtureScenario, SdkAdapter} from '@holokai/test-sdk';
 
 const adapter: SdkAdapter = {
     family: 'openai',

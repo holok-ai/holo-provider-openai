@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import {injectable} from 'tsyringe';
-import {BaseTranslator} from "@holokai/sdk/provider";
-import {HoloContent, HoloContentImage, HoloContentText} from "@holokai/types/holo";
+import {BaseTranslator} from "@holokai/holo-sdk/provider";
+import {HoloContent, HoloContentImage, HoloContentText} from "@holokai/holo-types/holo";
 import {
     ChatCompletionContentPart,
     ChatCompletionContentPartImage,

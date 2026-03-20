@@ -1,5 +1,5 @@
-import type {FixtureScenario} from '@holokai/test-harness';
-import {ProviderResponseStatus} from '@holokai/types/entities';
+import type {FixtureScenario} from '@holokai/test-sdk';
+import {ProviderResponseStatus} from '@holokai/holo-types/entities';
 
 const responsePayload = {
     id: 'resp-test-456',

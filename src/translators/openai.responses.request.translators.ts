@@ -1,6 +1,6 @@
-import {pickDefined} from "@holokai/sdk";
-import {HoloContent, HoloMessage, HoloRequest, HoloTool} from "@holokai/types/holo";
-import {BaseTranslator} from "@holokai/sdk/provider";
+import {pickDefined} from "@holokai/holo-sdk";
+import {HoloContent, HoloMessage, HoloRequest, HoloTool} from "@holokai/holo-types/holo";
+import {BaseTranslator} from "@holokai/holo-sdk/provider";
 import {
     EasyInputMessage,
     ResponseCreateParams,

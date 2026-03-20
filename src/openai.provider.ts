@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
-import {BaseProvider} from '@holokai/sdk/provider';
-import type {IAuditor, IProviderTranslator, IResponseFactory} from '@holokai/types/provider';
-import {ProviderContext, RunHandle} from '@holokai/types/provider';
+import {BaseProvider} from '@holokai/holo-sdk/provider';
+import type {IAuditor, IProviderTranslator, IResponseFactory} from '@holokai/holo-types/provider';
+import {ProviderContext, RunHandle} from '@holokai/holo-types/provider';
 import {ResponseCreateParamsBase, ResponseErrorEvent, ResponseStreamEvent} from 'openai/resources/responses/responses';
 import {ChatCompletionCreateParamsBase} from 'openai/resources/chat/completions';
 import {OpenAIAuditor} from './openai.auditor';

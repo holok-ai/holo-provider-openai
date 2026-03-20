@@ -1,4 +1,4 @@
-import type {PricingDataset} from '@holokai/types/plugin';
+import type {PricingDataset} from '@holokai/holo-types/plugin';
 
 const M = 1_000_000;
 

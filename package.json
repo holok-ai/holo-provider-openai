@@ -56,13 +56,13 @@
     "prepublishOnly": "npm run clean && npm run build"
   },
   "peerDependencies": {
-    "@holokai/sdk": "^1.2.2"
+    "@holokai/holo-sdk": "^1.2.2"
   },
   "dependencies": {
     "openai": "^6.17.0"
   },
   "devDependencies": {
-    "@holokai/test-utils": "*",
+    "@holokai/test-sdk": "*",
     "@types/node": "^24.0.11",
     "typescript": "^5.8.3"
   }

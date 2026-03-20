@@ -1,9 +1,9 @@
 import {injectable} from 'tsyringe';
-import {countTokens, extractPromptByRole, extractTextContent, normalizeText, pickDefined} from "@holokai/sdk";
-import {BaseAuditor} from "@holokai/sdk/provider";
-import {HoloWorkerRequest, WorkerResponseEnvelope} from "@holokai/types/worker";
-import {ProviderDoneEvent, ProviderEvent} from "@holokai/types/provider";
-import {FinishReason, ProviderEnvelope, ProviderResponseMetrics, ProviderResponseStatus} from "@holokai/types/entities";
+import {countTokens, extractPromptByRole, extractTextContent, normalizeText, pickDefined} from "@holokai/holo-sdk";
+import {BaseAuditor} from "@holokai/holo-sdk/provider";
+import {HoloWorkerRequest, WorkerResponseEnvelope} from "@holokai/holo-types/worker";
+import {ProviderDoneEvent, ProviderEvent} from "@holokai/holo-types/provider";
+import {FinishReason, ProviderEnvelope, ProviderResponseMetrics, ProviderResponseStatus} from "@holokai/holo-types/entities";
 import {ChatCompletionChunk, ChatCompletionCreateParamsBase} from "openai/resources/chat/completions";
 import {ResponseCreateParamsBase} from "openai/resources/responses/responses";
 import {OpenAIProtocols} from "./plugin";

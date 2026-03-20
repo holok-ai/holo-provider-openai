@@ -12,7 +12,7 @@
 
 - [x] Extract provider logic from monolith to plugin package
 - [x] Create plugin manifest with configuration schema
-- [x] Migrate to `@holokai/sdk` imports
+- [x] Migrate to `@holokai/holo-sdk` imports
 - [x] Implement `ProviderPlugin` contract
 - [x] Add auto-discovery support
 - [x] Preserve streaming orchestration logic
@@ -41,7 +41,7 @@
 - `src/translators/streaming/openai.message.delta.translator.ts`
 
 **Issue**: OpenAI returns `created` as Unix timestamp in seconds.
-Per [SDK Provider Mappings](../../packages/sdk/docs/PROVIDER_MAPPINGS.md#openai--holo-responses), must convert to
+Per [SDK Provider Mappings](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md#openai--holo-responses), must convert to
 milliseconds.
 
 **Current Code**:
@@ -57,7 +57,7 @@ created: source.created ? source.created * 1000 : undefined  // ✅ Milliseconds
 ```
 
 **Reference
-**: [SDK Provider Mappings - Timestamp Normalization](../../packages/sdk/docs/PROVIDER_MAPPINGS.md#timestamp-normalization)
+**: [SDK Provider Mappings - Timestamp Normalization](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md#timestamp-normalization)
 
 **Impact**: Timestamp type mismatch; consumers expect milliseconds per Holo spec
 
@@ -115,7 +115,7 @@ HoloToolCall[]
 - Already parsed object → Pass through
 
 **Reference
-**: [SDK Provider Mappings - Tool Call Mapping](../../packages/sdk/docs/PROVIDER_MAPPINGS.md#tool-call-mappings)
+**: [SDK Provider Mappings - Tool Call Mapping](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md#tool-call-mappings)
 
 **Impact**: Tool call arguments unusable in Holo format; consumers expect object
 
@@ -129,7 +129,7 @@ HoloToolCall[]
 **Lines**: TBD (in orchestrator)
 
 **Issue**: OpenAI doesn't emit explicit `message_start` event.
-Per [SDK Provider Mappings](../../packages/sdk/docs/PROVIDER_MAPPINGS.md#streaming-mappings), orchestrator must
+Per [SDK Provider Mappings](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md#streaming-mappings), orchestrator must
 synthesize on first chunk.
 
 **Current Behavior**:
@@ -172,7 +172,7 @@ export class OpenAIStreamTranslator extends BaseStreamTranslator {
 **Architecture Note**: Requires stateful orchestrator (track `hasEmittedStart`). May conflict with "stateless
 translator" principle.
 
-**Reference**: [SDK Streaming Docs](../../packages/sdk/docs/README.md#streaming)
+**Reference**: [SDK Streaming Docs](../../packages/holo-sdk/docs/README.md#streaming)
 
 **Impact**: Missing `message_start` event; consumers expect it per Holo spec
 
@@ -192,7 +192,7 @@ translator" principle.
 
 **Current State**:
 
-- Plugin imports from `@holokai/sdk` for public APIs
+- Plugin imports from `@holokai/holo-sdk` for public APIs
 - Validators use ArkType with 200/228 validators (88% coverage)
 - Need to audit remaining `Record<string, unknown>` instances
 - Need to verify all tool parameters use `HoloJsonSchema`
@@ -208,12 +208,12 @@ translator" principle.
 2. **Replace with SDK types**:
     - Tool parameters: Use `HoloJsonSchema` instead of `Record<string, unknown>`
     - Tool arguments: Use `HoloFunctionArguments` instead of flexible types
-    - All Holo types: Import from `@holokai/sdk`
+    - All Holo types: Import from `@holokai/holo-sdk`
 
 3. **Complete remaining validators**: 28 types still need validators (12% gap)
 
 **Reference
-**: [SDK Capability Analysis - Type Safety](../../packages/sdk/docs/CAPABILITY_ANALYSIS.md#type-safety-analysis)
+**: [SDK Capability Analysis - Type Safety](../../packages/holo-sdk/docs/CAPABILITY_ANALYSIS.md#type-safety-analysis)
 
 **Impact**: Critical for type safety compliance with Holo spec
 
@@ -307,8 +307,8 @@ translator" principle.
    ```
 
 5. **Add validation tests per SDK docs**:
-    - See [SDK README Testing Section](../../packages/sdk/docs/README.md#testing)
-    - Verify all mappings from [Provider Mappings](../../packages/sdk/docs/PROVIDER_MAPPINGS.md)
+    - See [SDK README Testing Section](../../packages/holo-sdk/docs/README.md#testing)
+    - Verify all mappings from [Provider Mappings](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md)
 
 **Impact**: Confidence in migration completeness and SDK compliance
 
@@ -360,7 +360,7 @@ translator" principle.
 
 3. **Add to orchestrator**: Route Responses API events through translator
 
-**Reference**: [Provider Mappings - Responses API](../../packages/sdk/docs/PROVIDER_MAPPINGS.md#openai-responses-api)
+**Reference**: [Provider Mappings - Responses API](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md#openai-responses-api)
 
 **Impact**: Responses API not fully integrated with Holo format
 
@@ -592,7 +592,7 @@ This plugin maintains the core translation logic from the monolithic architectur
 
 ### SDK Compliance Checklist
 
-- [x] Uses `@holokai/sdk` imports
+- [x] Uses `@holokai/holo-sdk` imports
 - [ ] No `Record<string, unknown>` in production paths (#SDK-1)
 - [ ] No `any` types in production paths (#SDK-1)
 - [ ] Timestamp conversion to ms (#CRITICAL-1)
@@ -619,9 +619,9 @@ See `src/validators/` for implementation status.
 
 **Primary**:
 
-- [SDK Provider Mappings](../../packages/sdk/docs/PROVIDER_MAPPINGS.md) - Authoritative mapping reference
-- [SDK Capability Analysis](../../packages/sdk/docs/CAPABILITY_ANALYSIS.md) - Type safety requirements
-- [SDK Holo Format](../../packages/sdk/docs/HOLO_FORMAT.md) - Format specification
+- [SDK Provider Mappings](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md) - Authoritative mapping reference
+- [SDK Capability Analysis](../../packages/holo-sdk/docs/CAPABILITY_ANALYSIS.md) - Type safety requirements
+- [SDK Holo Format](../../packages/holo-sdk/docs/HOLO_FORMAT.md) - Format specification
 
 **Legacy** (Archived):
 
@@ -637,7 +637,7 @@ When picking up a task:
 1. Check SDK documentation first for latest guidance
 2. Write tests before implementation
 3. Update README.md if adding features
-4. Ensure all types come from `@holokai/sdk`
+4. Ensure all types come from `@holokai/holo-sdk`
 5. Add integration tests for user-facing changes
 6. Follow ArkType validator standards from CLAUDE.md
 

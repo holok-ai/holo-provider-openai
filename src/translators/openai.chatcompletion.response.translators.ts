@@ -2,9 +2,9 @@ import 'reflect-metadata';
 import {OpenAIResponseMessageTranslator} from "./openai.response.message.translators";
 import {OpenAIUsageTranslator} from "./openai.usage.translators";
 import {injectable} from 'tsyringe';
-import {pickDefined} from "@holokai/sdk";
-import {HoloFinishReason, HoloMessage, HoloResponse} from "@holokai/types/holo";
-import {BaseTranslator} from "@holokai/sdk/provider";
+import {pickDefined} from "@holokai/holo-sdk";
+import {HoloFinishReason, HoloMessage, HoloResponse} from "@holokai/holo-types/holo";
+import {BaseTranslator} from "@holokai/holo-sdk/provider";
 import {ChatCompletion, ChatCompletionChunk} from "openai/resources/chat/completions/completions";
 
 @injectable()

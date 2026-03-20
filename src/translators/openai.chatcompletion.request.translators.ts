@@ -1,9 +1,9 @@
 import {OpenAIMessageTranslator} from "./openai.message.translators";
 import {OpenAIToolChoiceTranslator, OpenAIToolTranslator} from "./openai.tool.translators";
 import {injectable} from 'tsyringe';
-import {pickDefined} from "@holokai/sdk";
-import {HoloMessage, HoloRequest, HoloResponseFormat, HoloTool, HoloToolChoice} from "@holokai/types/holo";
-import {BaseTranslator} from "@holokai/sdk/provider";
+import {pickDefined} from "@holokai/holo-sdk";
+import {HoloMessage, HoloRequest, HoloResponseFormat, HoloTool, HoloToolChoice} from "@holokai/holo-types/holo";
+import {BaseTranslator} from "@holokai/holo-sdk/provider";
 import {ChatCompletionCreateParamsBase} from "openai/resources/chat/completions";
 import {ResponseFormatJSONObject, ResponseFormatJSONSchema, ResponseFormatText} from "openai/resources/shared";
 import {

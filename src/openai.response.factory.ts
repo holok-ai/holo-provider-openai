@@ -1,5 +1,5 @@
-import type {IResponseFactory} from "@holokai/types/provider";
-import {HoloErrorCode} from "@holokai/types/holo";
+import type {IResponseFactory} from "@holokai/holo-types/provider";
+import {HoloErrorCode} from "@holokai/holo-types/holo";
 import {ResponseErrorEvent} from "openai/resources/responses/responses";
 
 export type OpenAIResponseCode = | 'server_error'
