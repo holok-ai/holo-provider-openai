@@ -72,7 +72,11 @@ export class OpenAIProviderPlugin extends BasePlugin implements IProviderPlugin 
                 method: 'POST',
                 protocol: {
                     name: OpenAIProtocols.CHAT_COMPLETIONS,
-                    capability: ProtocolCapability.CHAT
+                    capability: ProtocolCapability.CHAT,
+                    streamEventSequence: {
+                        ordered: ['message_start', 'content_delta', 'message_stop'],
+                        repeatable: ['content_delta'],
+                    }
                 },
                 handler: RouteHandler.REQUEST
             },
@@ -81,7 +85,11 @@ export class OpenAIProviderPlugin extends BasePlugin implements IProviderPlugin 
                 method: 'POST',
                 protocol: {
                     name: OpenAIProtocols.RESPONSES,
-                    capability: ProtocolCapability.CHAT
+                    capability: ProtocolCapability.CHAT,
+                    streamEventSequence: {
+                        ordered: ['response.created', 'response.output_item.added', 'response.content_part.added', 'response.output_text.delta', 'response.content_part.done', 'response.output_item.done', 'response.completed'],
+                        repeatable: ['response.output_text.delta'],
+                    }
                 },
                 handler: RouteHandler.REQUEST
             },
