@@ -14,7 +14,7 @@ import {
     OpenAIToolTranslator,
     OpenAIUsageTranslator
 } from "./translators";
-import {HoloMessage, HoloRequest, HoloResponse, HoloStreamChunk} from "@holokai/holo-types/holo";
+import {HoloEmbedParams, HoloMessage, HoloRequest, HoloResponse, HoloStreamChunk} from "@holokai/holo-types/holo";
 import {
     ChatCompletion,
     ChatCompletionChunk,
@@ -98,5 +98,22 @@ export class OpenAITranslator implements IProviderTranslator {
 
     async fromHoloStreamChunks(chunks: HoloStreamChunk[]): Promise<unknown> {
         return this.streamTranslator.fromHoloManyArray(chunks);
+    }
+
+    async fromHoloEmbedRequest(request: HoloEmbedParams): Promise<any> {
+        return {
+            model: request.model,
+            input: request.input,
+        };
+    }
+
+    async toHoloEmbedResponse(response: any): Promise<{ model: string; embeddings: number[][]; usage?: any }> {
+        const model = response?.model ?? '';
+        const embeddings = (response?.data ?? []).map((d: any) => d.embedding);
+        const usage = response?.usage ? {
+            input_tokens: response.usage.prompt_tokens,
+            total_tokens: response.usage.total_tokens,
+        } : undefined;
+        return {model, embeddings, usage};
     }
 }

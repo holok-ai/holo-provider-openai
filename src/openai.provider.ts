@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import {BaseProvider} from '@holokai/holo-sdk/provider';
+import {pickDefined} from '@holokai/holo-sdk';
 import type {IAuditor, IProviderTranslator, IResponseFactory} from '@holokai/holo-types/provider';
 import {ProviderContext, RunHandle} from '@holokai/holo-types/provider';
 import {ResponseCreateParamsBase, ResponseErrorEvent, ResponseStreamEvent} from 'openai/resources/responses/responses';
@@ -13,6 +14,7 @@ import {ChatCompletionCreateParamsStreaming} from "openai/resources/chat/complet
 import {Stream} from "openai/core/streaming";
 import {EmbeddingCreateParams} from "openai/resources";
 import {OpenAIProtocols} from "./plugin";
+import {ProtocolCapability} from '@holokai/holo-types/entities';
 
 /**
  * OpenAI provider for connecting to OpenAI API
@@ -92,6 +94,23 @@ export class OpenAIProvider extends BaseProvider<OpenAI, EmbeddingCreateParams |
         return OpenAIResponseFactory.instance();
     }
 
+    protected async translatePayload(capability: ProtocolCapability | undefined, payload: any, protocolName?: string): Promise<any> {
+        const translated = await super.translatePayload(capability, payload, protocolName);
+        if (protocolName === OpenAIProtocols.RESPONSES) {
+            const lastUserMsg = translated.messages?.findLast((m: any) => m.role === 'user');
+            const maxTokens = translated.max_completion_tokens ?? translated.max_tokens;
+            return pickDefined({
+                model: translated.model,
+                input: lastUserMsg?.content ?? '',
+                max_output_tokens: maxTokens != null ? Math.max(maxTokens, 16) : undefined,
+                stream: translated.stream,
+                temperature: translated.temperature,
+                top_p: translated.top_p,
+            });
+        }
+        return translated;
+    }
+
     protected async handleError(error: APIError): Promise<ResponseErrorEvent> {
         if (error.error) {
             // may need to validate what the error is
@@ -151,6 +170,7 @@ export class OpenAIProvider extends BaseProvider<OpenAI, EmbeddingCreateParams |
                         finalChunk = event;
                         break;
                     }
+
                     ctx.emitStreamEvent(event);
 
                     if (event.type === 'response.output_text.delta') {
@@ -187,15 +207,15 @@ export class OpenAIProvider extends BaseProvider<OpenAI, EmbeddingCreateParams |
 
                 let finalChunk;
                 for await (const chunk of stream) {
-                    if ((includesUsage && !!chunk.usage) ||
-                        (!includesUsage && !!chunk.choices?.[0]?.finish_reason)) {
-                        finalChunk = chunk;
-                        break;
-                    }
                     const delta = chunk.choices?.[0]?.delta?.content;
                     ctx.emitStreamEvent(chunk);
                     if (typeof delta === 'string' && delta.length) {
                         ctx.emitTextDelta(delta);
+                    }
+                    if ((includesUsage && !!chunk.usage) ||
+                        (!includesUsage && !!chunk.choices?.[0]?.finish_reason)) {
+                        finalChunk = chunk;
+                        break;
                     }
                 }
                 return finalChunk;

@@ -4,6 +4,7 @@ import {BaseAuditor} from "@holokai/holo-sdk/provider";
 import {HoloWorkerRequest, WorkerResponseEnvelope} from "@holokai/holo-types/worker";
 import {ProviderDoneEvent, ProviderEvent} from "@holokai/holo-types/provider";
 import {FinishReason, ProviderEnvelope, ProviderResponseMetrics, ProviderResponseStatus} from "@holokai/holo-types/entities";
+import type {HoloFinishReason, HoloUsage} from "@holokai/holo-types/holo";
 import {ChatCompletionChunk, ChatCompletionCreateParamsBase} from "openai/resources/chat/completions";
 import {ResponseCreateParamsBase} from "openai/resources/responses/responses";
 import {OpenAIProtocols} from "./plugin";
@@ -98,33 +99,66 @@ export class OpenAIAuditor extends BaseAuditor {
         return options;
     }
 
-    protected async mapProviderResponseMetrics(providerEvent: ProviderDoneEvent, protocolName: string): Promise<Partial<ProviderResponseMetrics>> {
-        if (protocolName === OpenAIProtocols.RESPONSES) {
-            const msg = providerEvent.message;
-            const usage = msg?.response?.usage ?? msg?.usage;
-            if (!usage) return {};
-            const {input_tokens, output_tokens, total_tokens} = usage;
+    override mapFinishReason(nativeResponse: any, protocolName?: string): HoloFinishReason {
+        if (!nativeResponse) return 'stop';
 
-            if (!usage) return {};
-            return pickDefined({
-                input_tokens,
-                output_tokens,
-                total_tokens,
-                usage_raw: usage
-            }) as Partial<ProviderResponseMetrics>;
-        } else if (protocolName === OpenAIProtocols.CHAT_COMPLETIONS) {
-            const payload = providerEvent.message as ChatCompletionChunk;
-            const usage = payload.usage;
-            if (!usage) return {};
-
-            return pickDefined({
-                input_tokens: usage.prompt_tokens,
-                output_tokens: usage.completion_tokens,
-                total_tokens: usage.total_tokens,
-                usage_raw: usage
-            }) as Partial<ProviderResponseMetrics>;
+        if (protocolName === OpenAIProtocols.RESPONSES || nativeResponse.response) {
+            const status = nativeResponse.response?.status;
+            if (status === 'failed') return 'error';
+            if (status === 'incomplete') return 'length';
+            const hasToolCalls = nativeResponse.response?.output?.some((item: any) => item.type === 'function_call');
+            return hasToolCalls ? 'tool_calls' : 'stop';
         }
-        return {};
+
+        const finishReason = nativeResponse.choices?.[0]?.finish_reason;
+        switch (finishReason) {
+            case 'tool_calls':
+                return 'tool_calls';
+            case 'length':
+                return 'length';
+            case 'content_filter':
+                return 'content_filter';
+            default:
+                return 'stop';
+        }
+    }
+
+    override mapUsage(nativeResponse: any, protocolName?: string): HoloUsage {
+        if (!nativeResponse) return {};
+
+        if (protocolName === OpenAIProtocols.RESPONSES || nativeResponse.response) {
+            const usage = nativeResponse.response?.usage ?? nativeResponse.usage;
+            if (!usage) return {};
+            return pickDefined({
+                input_tokens: usage.input_tokens,
+                output_tokens: usage.output_tokens,
+                total_tokens: usage.total_tokens,
+            });
+        }
+
+        const usage = (nativeResponse as ChatCompletionChunk).usage;
+        if (!usage) return {};
+        return pickDefined({
+            input_tokens: usage.prompt_tokens,
+            output_tokens: usage.completion_tokens,
+            total_tokens: usage.total_tokens,
+        });
+    }
+
+    protected async mapProviderResponseMetrics(providerEvent: ProviderDoneEvent, protocolName: string): Promise<Partial<ProviderResponseMetrics>> {
+        const usage = this.mapUsage(providerEvent.message, protocolName);
+        if (!usage.input_tokens && !usage.output_tokens) return {};
+
+        const usageRaw = protocolName === OpenAIProtocols.RESPONSES
+            ? (providerEvent.message?.response?.usage ?? providerEvent.message?.usage)
+            : (providerEvent.message as ChatCompletionChunk)?.usage;
+
+        return pickDefined({
+            input_tokens: usage.input_tokens,
+            output_tokens: usage.output_tokens,
+            total_tokens: usage.total_tokens,
+            usage_raw: usageRaw,
+        }) as Partial<ProviderResponseMetrics>;
     }
 
     protected async mapResponseStatus(providerEvent: ProviderEvent, envelope: WorkerResponseEnvelope): Promise<ProviderResponseStatus> {
@@ -144,32 +178,9 @@ export class OpenAIAuditor extends BaseAuditor {
     }
 
     protected async extractFinishReason(providerEvent: ProviderEvent, _envelope: WorkerResponseEnvelope): Promise<FinishReason | undefined> {
-        if (providerEvent.type === 'error'
-        )
-            return FinishReason.ERROR;
+        if (providerEvent.type === 'error') return FinishReason.ERROR;
         if (providerEvent.type !== 'done') return undefined;
-
-        const message = providerEvent.message;
-
-        if (message?.response) {
-            const status = message.response.status;
-            if (status === 'failed') return FinishReason.ERROR;
-            if (status === 'incomplete') return FinishReason.LENGTH;
-            const hasToolCalls = message.response.output?.some((item: any) => item.type === 'function_call');
-            return hasToolCalls ? FinishReason.TOOL_CALLS : FinishReason.STOP;
-        }
-
-        const finishReason = message?.choices?.[0]?.finish_reason;
-        switch (finishReason) {
-            case 'tool_calls':
-                return FinishReason.TOOL_CALLS;
-            case 'length':
-                return FinishReason.LENGTH;
-            case 'content_filter':
-                return FinishReason.CONTENT_FILTER;
-            default:
-                return FinishReason.STOP;
-        }
+        return this.mapFinishReason(providerEvent.message) as FinishReason;
     }
 
     protected estimateInputTokens(envelope: WorkerResponseEnvelope):
