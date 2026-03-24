@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 import {BaseProvider} from '@holokai/holo-sdk/provider';
 import {pickDefined} from '@holokai/holo-sdk';
-import type {IAuditor, IProviderTranslator, IResponseFactory} from '@holokai/holo-types/provider';
+import type {DiscoveredModel, IAuditor, IProviderTranslator, IResponseFactory} from '@holokai/holo-types/provider';
 import {ProviderContext, RunHandle} from '@holokai/holo-types/provider';
 import {ResponseCreateParamsBase, ResponseErrorEvent, ResponseStreamEvent} from 'openai/resources/responses/responses';
 import {ChatCompletionCreateParamsBase} from 'openai/resources/chat/completions';
@@ -32,6 +32,20 @@ export class OpenAIProvider extends BaseProvider<OpenAI, EmbeddingCreateParams |
             object: response.object,
             data
         };
+    }
+
+    async discoverModels(): Promise<DiscoveredModel[]> {
+        const response = await this.client.models.list() as ModelsPage;
+        return response.data.map(m => ({
+            name: m.id,
+            accessModel: m.id,
+            description: `AI Model: ${m.id}`,
+            version: m.id.match(/-(\d+\.\d+(?:\.\d+)?)/)?.[1]
+                ?? m.id.match(/-(\d{4})/)?.[1]
+                ?? m.id.match(/-(\d+)$/)?.[1]
+                ?? '1.0',
+            metadata: m as Record<string, any>,
+        }));
     }
 
     async getModelNameFromRequest(payload: EmbeddingCreateParams | ResponseCreateParamsBase | ChatCompletionCreateParamsBase): Promise<string | undefined> {

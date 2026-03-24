@@ -110,6 +110,10 @@ export class OpenAIProviderPlugin extends BasePlugin implements IProviderPlugin 
         return normalizePricingDataset(OPENAI_PRICING_DATASET);
     }
 
+    getPricingModelIds() {
+        return OPENAI_PRICING_DATASET.model_ids;
+    }
+
     getDefaultPricing(): PluginPricingSheet {
         const sheets = this.getPricingSheets();
         const sorted = Array.from(sheets.values()).sort(
