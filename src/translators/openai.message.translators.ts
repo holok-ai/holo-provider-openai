@@ -27,7 +27,6 @@ export class OpenAIMessageTranslator extends BaseTranslator<HoloMessage, ChatCom
         if (typeof holoMessage.content === 'string') {
             content = holoMessage.content;
         } else if (Array.isArray(holoMessage.content)) {
-            // Filter out tool_call blocks — they are handled via holoMessage.tool_calls → tool_calls array
             const nonToolContent = holoMessage.content.filter((c: any) => c.type !== 'tool_call');
             const parts = await this.contentTranslator.fromHoloArray(nonToolContent);
             const validParts = parts.filter((p: any) => p && Object.keys(p).length > 0);

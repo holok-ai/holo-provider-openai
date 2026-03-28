@@ -221,10 +221,26 @@ export class OpenAIProvider extends BaseProvider<OpenAI, EmbeddingCreateParams |
 
                 let finalChunk;
                 for await (const chunk of stream) {
-                    const delta = chunk.choices?.[0]?.delta?.content;
+                    const choiceDelta = chunk.choices?.[0]?.delta;
+                    const toolCalls = choiceDelta?.tool_calls;
+                    if (Array.isArray(toolCalls)) {
+                        for (const tc of toolCalls) {
+                            const idx = tc.index ?? 0;
+                            if (tc.id || tc.function?.name) {
+                                const delta: { id?: string; name?: string } = {};
+                                if (tc.id) delta.id = tc.id;
+                                if (tc.function?.name) delta.name = tc.function.name;
+                                ctx.emitToolCallDelta(idx, delta);
+                            }
+                            if (tc.function?.arguments) {
+                                ctx.emitToolCallDelta(idx, {arguments_delta: tc.function.arguments});
+                            }
+                        }
+                    }
                     ctx.emitStreamEvent(chunk);
-                    if (typeof delta === 'string' && delta.length) {
-                        ctx.emitTextDelta(delta);
+                    const textDelta = choiceDelta?.content;
+                    if (typeof textDelta === 'string' && textDelta.length) {
+                        ctx.emitTextDelta(textDelta);
                     }
                     if ((includesUsage && !!chunk.usage) ||
                         (!includesUsage && !!chunk.choices?.[0]?.finish_reason)) {
