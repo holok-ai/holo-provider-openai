@@ -3,7 +3,12 @@ import {countTokens, extractPromptByRole, extractTextContent, normalizeText, pic
 import {BaseAuditor} from "@holokai/holo-sdk/provider";
 import {HoloWorkerRequest, WorkerResponseEnvelope} from "@holokai/holo-types/worker";
 import {ProviderDoneEvent, ProviderEvent} from "@holokai/holo-types/provider";
-import {FinishReason, ProviderEnvelope, ProviderResponseMetrics, ProviderResponseStatus} from "@holokai/holo-types/entities";
+import {
+    FinishReason,
+    ProviderEnvelope,
+    ProviderResponseMetrics,
+    ProviderResponseStatus
+} from "@holokai/holo-types/entities";
 import type {HoloFinishReason, HoloUsage} from "@holokai/holo-types/holo";
 import {ChatCompletionChunk, ChatCompletionCreateParamsBase} from "openai/resources/chat/completions";
 import {ResponseCreateParamsBase} from "openai/resources/responses/responses";
@@ -12,6 +17,52 @@ import {OpenAIProtocols} from "./plugin";
 @injectable()
 export class OpenAIAuditor extends BaseAuditor {
     readonly provider = 'openai';
+
+    override mapFinishReason(nativeResponse: any, protocolName?: string): HoloFinishReason {
+        if (!nativeResponse) return 'stop';
+
+        if (protocolName === OpenAIProtocols.RESPONSES || nativeResponse.response) {
+            const status = nativeResponse.response?.status;
+            if (status === 'failed') return 'error';
+            if (status === 'incomplete') return 'length';
+            const hasToolCalls = nativeResponse.response?.output?.some((item: any) => item.type === 'function_call');
+            return hasToolCalls ? 'tool_calls' : 'stop';
+        }
+
+        const finishReason = nativeResponse.choices?.[0]?.finish_reason;
+        switch (finishReason) {
+            case 'tool_calls':
+                return 'tool_calls';
+            case 'length':
+                return 'length';
+            case 'content_filter':
+                return 'content_filter';
+            default:
+                return 'stop';
+        }
+    }
+
+    override mapUsage(nativeResponse: any, protocolName?: string): HoloUsage {
+        if (!nativeResponse) return {};
+
+        if (protocolName === OpenAIProtocols.RESPONSES || nativeResponse.response) {
+            const usage = nativeResponse.response?.usage ?? nativeResponse.usage;
+            if (!usage) return {};
+            return pickDefined({
+                input_tokens: usage.input_tokens,
+                output_tokens: usage.output_tokens,
+                total_tokens: usage.total_tokens,
+            });
+        }
+
+        const usage = (nativeResponse as ChatCompletionChunk).usage;
+        if (!usage) return {};
+        return pickDefined({
+            input_tokens: usage.prompt_tokens,
+            output_tokens: usage.completion_tokens,
+            total_tokens: usage.total_tokens,
+        });
+    }
 
     protected async extractRequestOptions(workerRequest: HoloWorkerRequest): Promise<Record<string, any>> {
         let options: Record<string, any>;
@@ -97,52 +148,6 @@ export class OpenAIAuditor extends BaseAuditor {
         }
 
         return options;
-    }
-
-    override mapFinishReason(nativeResponse: any, protocolName?: string): HoloFinishReason {
-        if (!nativeResponse) return 'stop';
-
-        if (protocolName === OpenAIProtocols.RESPONSES || nativeResponse.response) {
-            const status = nativeResponse.response?.status;
-            if (status === 'failed') return 'error';
-            if (status === 'incomplete') return 'length';
-            const hasToolCalls = nativeResponse.response?.output?.some((item: any) => item.type === 'function_call');
-            return hasToolCalls ? 'tool_calls' : 'stop';
-        }
-
-        const finishReason = nativeResponse.choices?.[0]?.finish_reason;
-        switch (finishReason) {
-            case 'tool_calls':
-                return 'tool_calls';
-            case 'length':
-                return 'length';
-            case 'content_filter':
-                return 'content_filter';
-            default:
-                return 'stop';
-        }
-    }
-
-    override mapUsage(nativeResponse: any, protocolName?: string): HoloUsage {
-        if (!nativeResponse) return {};
-
-        if (protocolName === OpenAIProtocols.RESPONSES || nativeResponse.response) {
-            const usage = nativeResponse.response?.usage ?? nativeResponse.usage;
-            if (!usage) return {};
-            return pickDefined({
-                input_tokens: usage.input_tokens,
-                output_tokens: usage.output_tokens,
-                total_tokens: usage.total_tokens,
-            });
-        }
-
-        const usage = (nativeResponse as ChatCompletionChunk).usage;
-        if (!usage) return {};
-        return pickDefined({
-            input_tokens: usage.prompt_tokens,
-            output_tokens: usage.completion_tokens,
-            total_tokens: usage.total_tokens,
-        });
     }
 
     protected async mapProviderResponseMetrics(providerEvent: ProviderDoneEvent, protocolName: string): Promise<Partial<ProviderResponseMetrics>> {

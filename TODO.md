@@ -360,7 +360,8 @@ translator" principle.
 
 3. **Add to orchestrator**: Route Responses API events through translator
 
-**Reference**: [Provider Mappings - Responses API](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md#openai-responses-api)
+**Reference
+**: [Provider Mappings - Responses API](../../packages/holo-sdk/docs/PROVIDER_MAPPINGS.md#openai-responses-api)
 
 **Impact**: Responses API not fully integrated with Holo format
 
