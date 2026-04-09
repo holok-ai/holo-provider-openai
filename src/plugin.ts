@@ -64,7 +64,13 @@ export class OpenAIProviderPlugin extends BasePlugin implements IProviderPlugin 
                     temperature: {type: 'number', title: 'Temperature', minimum: 0, maximum: 2, default: 1},
                     max_tokens: {type: 'integer', title: 'Max Tokens', minimum: 1},
                     top_p: {type: 'number', title: 'Top P', minimum: 0, maximum: 1},
-                    frequency_penalty: {type: 'number', title: 'Frequency Penalty', minimum: -2, maximum: 2, default: 0},
+                    frequency_penalty: {
+                        type: 'number',
+                        title: 'Frequency Penalty',
+                        minimum: -2,
+                        maximum: 2,
+                        default: 0
+                    },
                     presence_penalty: {type: 'number', title: 'Presence Penalty', minimum: -2, maximum: 2, default: 0},
                 },
             },
