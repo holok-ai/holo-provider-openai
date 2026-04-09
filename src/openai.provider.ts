@@ -96,7 +96,6 @@ export class OpenAIProvider extends BaseProvider<OpenAI, EmbeddingCreateParams |
     }
 
     protected createClient(): OpenAI {
-        this.log.info(JSON.stringify(this._config));
         return new OpenAI(this._config);
     }
 
