@@ -1,5 +1,5 @@
 import {BasePlugin, normalizePricingDataset} from '@holokai/holo-sdk/plugin';
-import type {IProviderPlugin, PluginContext, PluginPricingSheet} from '@holokai/holo-types/plugin';
+import type {IProviderPlugin, PluginContext, PluginPricingSheet, PluginSchema} from '@holokai/holo-types/plugin';
 import type {PricingSheetModel} from '@holokai/holo-types/entities';
 import {ProtocolCapability} from "@holokai/holo-types/entities";
 import {manifest} from "./manifest.js";
@@ -44,6 +44,31 @@ export class OpenAIProviderPlugin extends BasePlugin implements IProviderPlugin 
     getProtocolByCapability(capability: ProtocolCapability): string | undefined {
         const route = this.getRoutes().find(r => r.protocol.capability === capability);
         return route?.protocol.name;
+    }
+
+    getSchema(): PluginSchema {
+        return {
+            connection: {
+                type: 'object',
+                properties: {
+                    apiKey: {type: 'string', title: 'API Key', format: 'password'},
+                    baseUrl: {type: 'string', title: 'Base URL', format: 'uri'},
+                    organizationId: {type: 'string', title: 'Organization ID'},
+                },
+                required: ['apiKey'],
+                sensitive: ['apiKey'],
+            },
+            parameters: {
+                type: 'object',
+                properties: {
+                    temperature: {type: 'number', title: 'Temperature', minimum: 0, maximum: 2, default: 1},
+                    max_tokens: {type: 'integer', title: 'Max Tokens', minimum: 1},
+                    top_p: {type: 'number', title: 'Top P', minimum: 0, maximum: 1},
+                    frequency_penalty: {type: 'number', title: 'Frequency Penalty', minimum: -2, maximum: 2, default: 0},
+                    presence_penalty: {type: 'number', title: 'Presence Penalty', minimum: -2, maximum: 2, default: 0},
+                },
+            },
+        };
     }
 
     getCapabilities(): ProviderCapabilities {
