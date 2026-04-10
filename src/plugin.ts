@@ -51,12 +51,12 @@ export class OpenAIProviderPlugin extends BasePlugin implements IProviderPlugin 
             connection: {
                 type: 'object',
                 properties: {
-                    apiKey: {type: 'string', title: 'API Key', format: 'password'},
-                    baseUrl: {type: 'string', title: 'Base URL', format: 'uri'},
+                    apiKey: {type: 'string', title: 'API Key', format: 'password', default: 'blank'},
+                    baseURL: {type: 'string', title: 'Base URL', format: 'uri'},
                     organizationId: {type: 'string', title: 'Organization ID'},
                 },
                 required: ['apiKey'],
-                sensitive: ['apiKey'],
+                encrypted: ['apiKey'],
             },
             parameters: {
                 type: 'object',
