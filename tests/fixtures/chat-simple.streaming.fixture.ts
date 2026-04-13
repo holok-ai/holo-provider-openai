@@ -1,6 +1,6 @@
 import type {FixtureScenario} from '@holokai/holo-test';
 import {ProviderResponseStatus} from '@holokai/holo-types/entities';
-import sdkAdapter from '../sdk-adapter.js';
+import sdkAdapter from '../sdk-adapter';
 
 const chunk1 = {
     id: 'chatcmpl-test-123',

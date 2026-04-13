@@ -2,13 +2,13 @@ import {BasePlugin, normalizePricingDataset} from '@holokai/holo-sdk/plugin';
 import type {IProviderPlugin, PluginContext, PluginPricingSheet, PluginSchema} from '@holokai/holo-types/plugin';
 import type {PricingSheetModel} from '@holokai/holo-types/entities';
 import {ProtocolCapability} from "@holokai/holo-types/entities";
-import {manifest} from "./manifest.js";
+import {manifest} from "./manifest";
 import type {IProvider, IWireAdapter, ProviderCapabilities, WireAdapterParams} from "@holokai/holo-types/provider";
 import {OpenAIProvider} from "./openai.provider";
 import {RouteDefinition, RouteHandler} from "@holokai/holo-types/routing";
 import {OpenAITranslator} from "./openai.translator";
 import {OpenAICompletionsWireAdapter, OpenAIResponsesWireAdapter} from "./openai.wire.adapter";
-import {OPENAI_PRICING_DATASET} from "./openai.pricing.js";
+import {OPENAI_PRICING_DATASET} from "./openai.pricing";
 
 export const OpenAIProtocols = {
     EMBED: 'openai.embeddings',

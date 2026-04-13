@@ -5,7 +5,7 @@
  * Exports the plugin instance as default export per Holo plugin contract.
  */
 
-import {OpenAIProviderPlugin} from './plugin.js';
+import {OpenAIProviderPlugin} from './plugin';
 
 export * from './translators';
 export * from './manifest';

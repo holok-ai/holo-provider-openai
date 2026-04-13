@@ -1,10 +1,10 @@
 import {describe, it} from 'vitest';
 import {runRoundTripContract} from '@holokai/holo-test';
-import adapter from '../sdk-adapter.js';
-import chatStreaming from '../fixtures/chat-simple.streaming.fixture.js';
-import chatNonStreaming from '../fixtures/chat-simple.nonstreaming.fixture.js';
-import responseStreaming from '../fixtures/response-simple.streaming.fixture.js';
-import responseNonStreaming from '../fixtures/response-simple.nonstreaming.fixture.js';
+import adapter from '../sdk-adapter';
+import chatStreaming from '../fixtures/chat-simple.streaming.fixture';
+import chatNonStreaming from '../fixtures/chat-simple.nonstreaming.fixture';
+import responseStreaming from '../fixtures/response-simple.streaming.fixture';
+import responseNonStreaming from '../fixtures/response-simple.nonstreaming.fixture';
 
 const fixtures = [chatStreaming, chatNonStreaming, responseStreaming, responseNonStreaming];
 
