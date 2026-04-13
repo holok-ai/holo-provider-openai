@@ -77,6 +77,10 @@ export class OpenAIProviderPlugin extends BasePlugin implements IProviderPlugin 
         };
     }
 
+    getTestModels() {
+        return {chat: 'gpt-4o-mini', embed: 'text-embedding-3-small'};
+    }
+
     getCapabilities(): ProviderCapabilities {
         return {
             streaming: true,
